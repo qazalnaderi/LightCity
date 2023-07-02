@@ -37,7 +37,7 @@ public class Menu {
     static Font font8 = new Font("SansSerif", 1, 20);
     static Font font9 = new Font("SansSerif", 2, 20);
 
-    private static Game game = new Game();
+    protected static Game game = new Game();
     private static Scanner scanner = new Scanner(System.in);
     public static void showMenu(){
         mainMenu();
@@ -221,7 +221,8 @@ public class Menu {
 
                     frame2.setVisible(true);
                 } else {
-
+                    frame1.dispose();
+                    new Database(username,pass);
                 }
             }
         });
