@@ -11,8 +11,8 @@ public class Database {
     static final String DB_URL = "jdbc:mysql://localhost/lightcity";
 
     // Database credentials
-    static final String USER = "your_username";
-    static final String PASS = "your_password";
+    static final String USER = "root";
+    static final String PASS = "19911994";
 
 
     private Connection conn;
@@ -50,17 +50,21 @@ public class Database {
 
     }
 
-    public void loginGame(User user) {
+    public boolean loginGame(User user) {
         try {
-            Statement stmt = conn.createStatement();
-            String query = "";
-            ResultSet res = stmt.executeQuery(query);
-            while (res.next()) {
-//               Check
+            Connection connection = DriverManager.getConnection(DB_URL, USER, PASS);
+            String query = "SELECT Password from avatar WHERE Username = ? and Password = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1,user.getUsername());
+            preparedStatement.setString(2,user.getPassword());
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                return true;
             }
         } catch (Exception exception) {
         }
-
+        return false;
     }
 
     public void registerGame(User user) {
