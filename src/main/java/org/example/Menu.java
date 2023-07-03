@@ -248,6 +248,8 @@ public class Menu {
                             public void actionPerformed(ActionEvent e) {
                                 frame2.dispose();
 
+
+
 //                        Menu.game.continueGame(User );
 //                        return user;
 //                                makeUser(user);
