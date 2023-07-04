@@ -2,6 +2,7 @@ package org.example;
 
 import org.example.models.User;
 
+import javax.xml.crypto.Data;
 import java.sql.*;
 
 public class Database {
@@ -14,13 +15,13 @@ public class Database {
     static final String PASS = "19911994";
 
 
-    private Connection connection;
-    static boolean information = false;
+    private Connection conn;
+
     public Database() {
         try {
             Class.forName(JDBC_DRIVER);
-            connection = DriverManager.getConnection(DB_URL, USER, PASS);
-
+            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            System.out.println("Connecting to database...");
         } catch (Exception exp) {
             System.out.println("Database Exception : \n" + exp.toString());
             System.exit(0);
@@ -37,7 +38,7 @@ public class Database {
         String query = "CREATE TABLE IF NOT EXISTS Users (username varchar(255) primary key ,password varchar(255));" +
                 "CREATE TABLE IF NOT EXISTS ....";
         try {
-            Statement stmt = connection.createStatement();
+            Statement stmt = conn.createStatement();
            if(stmt.execute(query)){
 
            }else
@@ -49,22 +50,21 @@ public class Database {
 
     }
 
-    public User loginGame(User user) {
+    public boolean loginGame(User user) {
         try {
-            connection = DriverManager.getConnection(DB_URL, USER, PASS);
-            String query = "SELECT Username and Password from avatar WHERE Username = ? and Password = ?";
+            Connection connection = DriverManager.getConnection(DB_URL, USER, PASS);
+            String query = "SELECT Password from avatar WHERE Username = ? and Password = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1,user.getUsername());
             preparedStatement.setString(2,user.getPassword());
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
-                return user;
+                return true;
             }
         } catch (Exception exception) {
-
         }
-        return null;
+        return false;
     }
 
     public void registerGame(User user) {

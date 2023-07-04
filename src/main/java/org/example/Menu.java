@@ -5,6 +5,8 @@ import org.example.models.User;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -37,10 +39,8 @@ public class Menu {
     static Font font8 = new Font("SansSerif", 1, 20);
     static Font font9 = new Font("SansSerif", 2, 20);
 
-    protected static Game game = new Game();
+    private static Game game = new Game();
     private static Scanner scanner = new Scanner(System.in);
-
-    boolean information = false;
     public static void showMenu(){
         mainMenu();
     }
@@ -58,6 +58,7 @@ public class Menu {
         JButton Continue = new JButton(new AbstractAction("Continue") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                frame.dispose();
                 loginMenu();
             }
         });
@@ -110,6 +111,7 @@ public class Menu {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         frame1.dispose();
+
                         mainMenu();
                     }
                 });
@@ -225,17 +227,18 @@ public class Menu {
                     frame2.setVisible(true);
                 } else {
                     frame1.dispose();
+                    pass = encryption(pass);
                     User user = new User(username,pass);
                     Database database = new Database();
 //                    database.loginGame(user);
                     JFrame frame2;
-                    if (database.loginGame(user) != null) {
+                    if (database.loginGame(user)) {
                         frame2 = new JFrame("Signed in");
                         frame2.setBounds(220,140,400,350);
                         frame2.setLayout(null);
 
                         JLabel label = new JLabel("Successfully signed in");
-                        label.setBounds(100, 80, 350, 40);
+                        label.setBounds(80, 80, 350, 40);
                         label.setBackground(Menu.white2);
                         label.setFont(Menu.font8);
                         frame2.add(label);
@@ -245,9 +248,11 @@ public class Menu {
                             public void actionPerformed(ActionEvent e) {
                                 frame2.dispose();
 
+
+
 //                        Menu.game.continueGame(User );
 //                        return user;
-                                makeUser(user);
+//                                makeUser(user);
                             }
                         });
                         button.setBounds(120, 220, 150, 35);
@@ -258,7 +263,7 @@ public class Menu {
                     } else {
                         frame2 = new JFrame("error");
                         frame2.getContentPane().setBackground(Menu.white2);
-                        frame2.setBounds(220,140,400,350);
+                        frame2.setBounds(220, 140, 400, 350);
                         frame2.setLayout(null);
 
                         JLabel label = new JLabel("Invalid Information !");
@@ -278,9 +283,7 @@ public class Menu {
                         button.setBackground(Menu.white3);
                         button.setFont(Menu.font6);
                         frame2.add(button);
-
                     }
-                    frame2.setVisible(true);
                 }
             }
         });
@@ -293,6 +296,7 @@ public class Menu {
             @Override
             public void actionPerformed(ActionEvent e) {
                 frame1.dispose();
+                mainMenu();
             }
         });
         button2.setBounds(40,255,130,35);
@@ -303,10 +307,6 @@ public class Menu {
         frame1.setVisible(true);
 
         return null;
-    }
-
-    public static User makeUser(User user) {
-        return user;
     }
 
     public static void signUpMenu() {
@@ -406,6 +406,7 @@ public class Menu {
 
                     frame2.setVisible(true);
                 }else {
+                    pass = encryption(pass);
                     try {
                         Connection connection = DriverManager.getConnection(DB_URL,USER,PASS);
                         PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO avatar (Username , Password) VALUES (?,?)");
@@ -423,7 +424,7 @@ public class Menu {
                     frame2.setLayout(null);
 
                     JLabel label = new JLabel("Successfully signed up !");
-                    label.setBounds(100,50,350,40);
+                    label.setBounds(80,50,350,40);
                     label.setBackground(white2);
                     label.setFont(font8);
                     frame2.add(label);
@@ -454,6 +455,7 @@ public class Menu {
             @Override
             public void actionPerformed(ActionEvent e) {
                 frame1.dispose();
+                mainMenu();
             }
         });
         button2.setBounds(40,255,130,35);
@@ -508,6 +510,7 @@ public class Menu {
             @Override
             public void actionPerformed(ActionEvent e) {
                 frame1.dispose();
+                mainMenu();
             }
         });
         button2.setBounds(40,255,130,35);
@@ -520,4 +523,35 @@ public class Menu {
     public static void main(String[] args) {
         showMenu();
     }
+
+    public static String encryption(String pass) {
+        String encryptedPassword = null;
+        try
+        {
+            /* MessageDigest instance for MD5. */
+            MessageDigest m = MessageDigest.getInstance("MD5");
+
+            /* Add plain-text password bytes to digest using MD5 update() method. */
+            m.update(pass.getBytes());
+
+            /* Convert the hash value into bytes */
+            byte[] bytes = m.digest();
+
+            /* The bytes array has bytes in decimal form. Converting it into hexadecimal format. */
+            StringBuilder s = new StringBuilder();
+            for(int i=0; i< bytes.length ;i++)
+            {
+                s.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
+            }
+
+            /* Complete hashed password in hexadecimal format */
+            encryptedPassword = s.toString();
+        }
+        catch (NoSuchAlgorithmException e)
+        {
+            e.printStackTrace();
+        }
+        return encryptedPassword;
+    }
+
 }
